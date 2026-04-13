@@ -5,6 +5,7 @@
   "main": "server.js",
   "scripts": {
     "test": "npm run tests",
+    "tests": "mocha \"tests/**/*.test.js\"",
     "start": "node server.js"
   },
   "repository": {
@@ -22,6 +23,10 @@
     "url": "https://github.com/darshan2101/hr_management/issues"
   },
   "homepage": "https://github.com/darshan2101/hr_management#readme",
+  "devDependencies": {
+    "chai": "^5.2.0",
+    "mocha": "^11.7.1"
+  },
   "dependencies": {
     "express": "^5.2.1"
   }
