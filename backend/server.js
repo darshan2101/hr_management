@@ -2,6 +2,9 @@ const express = require('express');
 const EmployeeRepository = require('./src/repositories/EmployeeRepository');
 const EmployeeController = require('./src/controllers/EmployeeController');
 const { createEmployeeRouter } = require('./src/routes/employees');
+const InsightsRepository = require('./src/repositories/InsightsRepository');
+const InsightsController = require('./src/controllers/InsightsController');
+const { createInsightsRouter } = require('./src/routes/insights');
 const { getDb } = require('./src/db/database');
 
 const PORT = process.env.PORT || 4000;
@@ -18,8 +21,11 @@ function createApp() {
   const db = getDb();
   const employeeRepository = new EmployeeRepository(db);
   const employeeController = new EmployeeController(employeeRepository);
+  const insightsRepository = new InsightsRepository(db);
+  const insightsController = new InsightsController(insightsRepository);
 
   app.use('/api/employees', createEmployeeRouter(employeeController));
+  app.use('/api/insights', createInsightsRouter(insightsController));
 
   app.use((err, req, res, next) => {
     if (res.headersSent) {
