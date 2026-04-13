@@ -1,12 +1,45 @@
 const express = require('express');
-const app = express();
+const EmployeeRepository = require('./src/repositories/EmployeeRepository');
+const EmployeeController = require('./src/controllers/EmployeeController');
+const { createEmployeeRouter } = require('./src/routes/employees');
+const { getDb } = require('./src/db/database');
+
 const PORT = process.env.PORT || 4000;
 
-app.get('/api/hello', (req, res) => {
-  res.json({ message: 'Hello, World!' });
-});
+function createApp() {
+  const app = express();
+
+  app.use(express.json());
+
+  app.get('/api/hello', (req, res) => {
+    res.json({ message: 'Hello, World!' });
+  });
+
+  const db = getDb();
+  const employeeRepository = new EmployeeRepository(db);
+  const employeeController = new EmployeeController(employeeRepository);
+
+  app.use('/api/employees', createEmployeeRouter(employeeController));
+
+  app.use((err, req, res, next) => {
+    if (res.headersSent) {
+      next(err);
+      return;
+    }
+
+    if (err && typeof err.code === 'string' && err.code.startsWith('SQLITE_CONSTRAINT')) {
+      res.status(400).json({ error: 'Invalid employee data' });
+      return;
+    }
+
+    res.status(500).json({ error: 'Internal server error' });
+  });
+
+  return app;
+}
 
 function startServer(port = PORT) {
+  const app = createApp();
   return app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
   });
@@ -16,4 +49,4 @@ if (require.main === module) {
   startServer();
 }
 
-module.exports = { app, startServer };
+module.exports = { createApp, startServer };

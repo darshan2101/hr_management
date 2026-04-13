@@ -1,10 +1,13 @@
+process.env.NODE_ENV = 'test';
 const { expect } = require('chai');
 const { startServer } = require('../server');
+const { resetDb } = require('../src/db/database');
 
 let server;
 let baseUrl;
 
 before(async () => {
+  resetDb();
   server = startServer(0);
   await new Promise((resolve) => server.once('listening', resolve));
   const { port } = server.address();
@@ -26,6 +29,7 @@ after(async () => {
       resolve();
     });
   });
+  resetDb();
 });
 
 describe('Server API', () => {
