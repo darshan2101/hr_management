@@ -1,7 +1,5 @@
 const express = require('express');
-
-const asyncHandler = (fn) => (req, res, next) =>
-  Promise.resolve(fn(req, res, next)).catch(next);
+const asyncHandler = require('../utils/asyncHandler');
 
 function createEmployeeRouter(controller) {
   const router = express.Router();
