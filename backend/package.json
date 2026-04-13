@@ -1,0 +1,28 @@
+{
+  "name": "hr_management_backend",
+  "version": "1.0.0",
+  "description": "Application backend to manage 10000 employees",
+  "main": "server.js",
+  "scripts": {
+    "test": "npm run tests",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/darshan2101/hr_management.git"
+  },
+  "keywords": [
+    "Backend",
+    "Node.js",
+    "TDD"
+  ],
+  "author": "Darshan Babariya",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/darshan2101/hr_management/issues"
+  },
+  "homepage": "https://github.com/darshan2101/hr_management#readme",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}

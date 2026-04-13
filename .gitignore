@@ -1,0 +1,7 @@
+.github/
+.idea/
+.vscode/
+*.log
+*.tmp
+*.bak
+backend/node_modules/
