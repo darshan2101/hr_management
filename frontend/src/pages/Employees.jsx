@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import {
   createEmployee,
   deleteEmployee,
+  getCountries,
   getEmployees,
   updateEmployee
 } from '../api/employees';
@@ -92,11 +93,7 @@ function Employees() {
   const loadCountries = async () => {
     setCountriesError('');
     try {
-      const response = await fetch('/api/employees/countries');
-      if (!response.ok) {
-        throw new Error('Unable to load countries.');
-      }
-      const data = await response.json();
+      const data = await getCountries();
       setCountries(data.countries || []);
     } catch (err) {
       setCountriesError(err?.message || 'Unable to load countries.');

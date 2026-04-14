@@ -1,5 +1,8 @@
 import client from './client';
 
+export const getCountries = () =>
+  client.get('/api/employees/countries').then((res) => res.data);
+
 export const getEmployees = (params = {}) =>
   client.get('/api/employees', { params }).then((res) => res.data);
 

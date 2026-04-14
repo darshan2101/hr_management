@@ -4,6 +4,7 @@ import {
   getJobTitleInsights,
   getSummary
 } from '../api/insights';
+import { getCountries } from '../api/employees';
 
 const jobTitles = [
   'Engineer',
@@ -68,11 +69,7 @@ function Insights() {
   const loadCountries = async () => {
     setCountriesError('');
     try {
-      const response = await fetch('/api/employees/countries');
-      if (!response.ok) {
-        throw new Error('Unable to load countries.');
-      }
-      const data = await response.json();
+      const data = await getCountries();
       const list = data.countries || [];
       setCountries(list);
       if (!countrySelection && list.length) {
