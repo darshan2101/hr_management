@@ -21,7 +21,14 @@ class EmployeeController {
         limit: Number.isNaN(limit) ? undefined : limit,
         search: req.query.search,
         country: req.query.country,
-        jobTitle: req.query.jobTitle
+        jobTitle: req.query.jobTitle,
+        department: req.query.department,
+        salaryMin: req.query.salary_min ? Number(req.query.salary_min) : undefined,
+        salaryMax: req.query.salary_max ? Number(req.query.salary_max) : undefined,
+        hireDateFrom: req.query.hire_date_from,
+        hireDateTo: req.query.hire_date_to,
+        sortBy: req.query.sort_by,
+        sortOrder: req.query.sort_order
       });
       res.json(result);
     } catch (error) {

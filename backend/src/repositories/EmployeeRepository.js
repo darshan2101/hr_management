@@ -31,7 +31,7 @@ class EmployeeRepository {
     return this.findById(result.lastInsertRowid);
   }
 
-  findAll({ page = 1, limit = 20, search, country, jobTitle } = {}) {
+  findAll({ page = 1, limit = 20, search, country, jobTitle, department, salaryMin, salaryMax, hireDateFrom, hireDateTo, sortBy, sortOrder = 'asc' } = {}) {
     const filters = [];
     const params = [];
 
@@ -45,6 +45,31 @@ class EmployeeRepository {
       params.push(jobTitle);
     }
 
+    if (department) {
+      filters.push('department = ?');
+      params.push(department);
+    }
+
+    if (salaryMin !== undefined && salaryMin !== null) {
+      filters.push('salary >= ?');
+      params.push(salaryMin);
+    }
+
+    if (salaryMax !== undefined && salaryMax !== null) {
+      filters.push('salary <= ?');
+      params.push(salaryMax);
+    }
+
+    if (hireDateFrom) {
+      filters.push('hire_date >= ?');
+      params.push(hireDateFrom);
+    }
+
+    if (hireDateTo) {
+      filters.push('hire_date <= ?');
+      params.push(hireDateTo);
+    }
+
     if (search) {
       filters.push('(full_name LIKE ? OR job_title LIKE ?)');
       const term = `%${search}%`;
@@ -52,13 +77,24 @@ class EmployeeRepository {
     }
 
     const whereClause = filters.length ? `WHERE ${filters.join(' AND ')}` : '';
+    
+    // Build ORDER BY clause
+    let orderByClause = 'ORDER BY id ASC';
+    if (sortBy) {
+      const validColumns = ['id', 'full_name', 'job_title', 'department', 'country', 'salary', 'hire_date'];
+      if (validColumns.includes(sortBy)) {
+        const order = sortOrder === 'desc' ? 'DESC' : 'ASC';
+        orderByClause = `ORDER BY ${sortBy} ${order}`;
+      }
+    }
+
     const offset = (page - 1) * limit;
 
     const data = this.db.prepare(`
       SELECT *
       FROM employees
       ${whereClause}
-      ORDER BY id ASC
+      ${orderByClause}
       LIMIT ? OFFSET ?
     `).all(...params, limit, offset);
 
