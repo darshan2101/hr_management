@@ -5,19 +5,6 @@ import {
   getSummary
 } from '../api/insights';
 
-const countries = [
-  'USA',
-  'Canada',
-  'UK',
-  'Germany',
-  'France',
-  'Spain',
-  'India',
-  'Singapore',
-  'UAE',
-  'Australia'
-];
-
 const jobTitles = [
   'Engineer',
   'Senior Engineer',
@@ -40,14 +27,16 @@ const currencyFormatter = new Intl.NumberFormat('en-US', {
 });
 
 function Insights() {
-  const [countrySelection, setCountrySelection] = useState('USA');
+  const [countrySelection, setCountrySelection] = useState('');
   const [countryData, setCountryData] = useState(null);
   const [countryLoading, setCountryLoading] = useState(false);
   const [countryError, setCountryError] = useState('');
   const [countryEmpty, setCountryEmpty] = useState(false);
 
   const [jobTitleSelection, setJobTitleSelection] = useState('Engineer');
-  const [jobCountrySelection, setJobCountrySelection] = useState('USA');
+  const [jobCountrySelection, setJobCountrySelection] = useState('');
+  const [jobTitleInput, setJobTitleInput] = useState('');
+  const [jobTitleFilter, setJobTitleFilter] = useState('');
   const [jobData, setJobData] = useState(null);
   const [jobLoading, setJobLoading] = useState(false);
   const [jobError, setJobError] = useState('');
@@ -56,6 +45,8 @@ function Insights() {
   const [summary, setSummary] = useState(null);
   const [summaryLoading, setSummaryLoading] = useState(false);
   const [summaryError, setSummaryError] = useState('');
+  const [countries, setCountries] = useState([]);
+  const [countriesError, setCountriesError] = useState('');
 
   useEffect(() => {
     const loadSummary = async () => {
@@ -73,6 +64,39 @@ function Insights() {
 
     loadSummary();
   }, []);
+
+  const loadCountries = async () => {
+    setCountriesError('');
+    try {
+      const response = await fetch('/api/employees/countries');
+      if (!response.ok) {
+        throw new Error('Unable to load countries.');
+      }
+      const data = await response.json();
+      const list = data.countries || [];
+      setCountries(list);
+      if (!countrySelection && list.length) {
+        setCountrySelection(list[0]);
+      }
+      if (!jobCountrySelection && list.length) {
+        setJobCountrySelection(list[0]);
+      }
+    } catch (err) {
+      setCountriesError(err?.message || 'Unable to load countries.');
+    }
+  };
+
+  useEffect(() => {
+    loadCountries();
+  }, []);
+
+  useEffect(() => {
+    const handle = setTimeout(() => {
+      setJobTitleFilter(jobTitleInput.trim());
+    }, 300);
+
+    return () => clearTimeout(handle);
+  }, [jobTitleInput]);
 
   useEffect(() => {
     const loadCountryInsights = async () => {
@@ -129,6 +153,14 @@ function Insights() {
     loadJobInsights();
   }, [jobTitleSelection, jobCountrySelection]);
 
+  const filteredJobTitles = useMemo(() => {
+    if (!jobTitleFilter) {
+      return jobTitles;
+    }
+    const lower = jobTitleFilter.toLowerCase();
+    return jobTitles.filter((title) => title.toLowerCase().includes(lower));
+  }, [jobTitleFilter]);
+
   const summaryBars = useMemo(() => {
     if (!summary?.salaryRanges) {
       return [];
@@ -142,6 +174,45 @@ function Insights() {
 
   return (
     <section className="space-y-10">
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        {summaryLoading && (
+          <p className="text-sm text-ink-400">Loading summary…</p>
+        )}
+        {!summaryLoading && summaryError && (
+          <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {summaryError}
+          </div>
+        )}
+        {!summaryLoading && !summaryError && summary && (
+          <>
+            <div className="rounded-2xl border border-ink-100 bg-white p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-ink-400">
+                Total Employees
+              </p>
+              <p className="mt-3 text-2xl font-semibold text-ink-900">
+                {summary.totalEmployees.toLocaleString('en-US')}
+              </p>
+            </div>
+            <div className="rounded-2xl border border-ink-100 bg-white p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-ink-400">
+                Countries Count
+              </p>
+              <p className="mt-3 text-2xl font-semibold text-ink-900">
+                {summary.totalCountries.toLocaleString('en-US')}
+              </p>
+            </div>
+            <div className="rounded-2xl border border-ink-100 bg-white p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-ink-400">
+                Unique Job Titles
+              </p>
+              <p className="mt-3 text-2xl font-semibold text-ink-900">
+                {summary.totalJobTitles.toLocaleString('en-US')}
+              </p>
+            </div>
+          </>
+        )}
+      </div>
+
       <div className="space-y-4">
         <div>
           <h3 className="text-xl font-semibold text-ink-900">Insights</h3>
@@ -171,6 +242,9 @@ function Insights() {
             </select>
           </div>
 
+          {countriesError && (
+            <p className="mt-4 text-sm text-red-600">{countriesError}</p>
+          )}
           {countryLoading && (
             <p className="mt-6 text-sm text-ink-400">Loading country insights…</p>
           )}
@@ -180,7 +254,7 @@ function Insights() {
             </div>
           )}
           {!countryLoading && !countryError && countryEmpty && (
-            <p className="mt-6 text-sm text-ink-400">No results for this country.</p>
+            <p className="mt-6 text-sm text-ink-400">No data available.</p>
           )}
           {!countryLoading && !countryError && countryData && (
             <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -230,12 +304,19 @@ function Insights() {
             <h4 className="text-lg font-semibold text-ink-900">Salary by Role</h4>
           </div>
           <div className="flex flex-wrap gap-3">
+            <input
+              type="text"
+              placeholder="Filter job titles"
+              value={jobTitleInput}
+              onChange={(event) => setJobTitleInput(event.target.value)}
+              className="rounded-xl border border-ink-200 bg-white px-4 py-2 text-sm text-ink-700 placeholder:text-ink-400 focus:border-brand-400 focus:outline-none"
+            />
             <select
               value={jobTitleSelection}
               onChange={(event) => setJobTitleSelection(event.target.value)}
               className="rounded-xl border border-ink-200 bg-white px-4 py-2 text-sm text-ink-700 focus:border-brand-400 focus:outline-none"
             >
-              {jobTitles.map((title) => (
+              {filteredJobTitles.map((title) => (
                 <option key={title} value={title}>
                   {title}
                 </option>
@@ -261,8 +342,8 @@ function Insights() {
             {jobError}
           </div>
         )}
-        {!jobLoading && !jobError && jobEmpty && (
-          <p className="mt-6 text-sm text-ink-400">No results for this role and country.</p>
+        {!jobLoading && !jobError && (jobEmpty || filteredJobTitles.length === 0) && (
+          <p className="mt-6 text-sm text-ink-400">No data available.</p>
         )}
         {!jobLoading && !jobError && jobData && (
           <div className="mt-6 grid gap-4 md:grid-cols-2">
