@@ -8,6 +8,7 @@
     "build": "echo 'No build step required'",
     "tests": "mocha \"tests/**/*.test.js\"",
     "seed": "node scripts/seed.js",
+    "seed-and-start": "node scripts/seed.js && node server.js",
     "start": "node server.js"
   },
   "repository": {
