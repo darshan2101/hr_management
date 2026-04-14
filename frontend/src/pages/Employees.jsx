@@ -45,6 +45,12 @@ function Employees() {
   const [countryFilter, setCountryFilter] = useState('all');
   const [countries, setCountries] = useState([]);
   const [countriesError, setCountriesError] = useState('');
+  const [salaryMin, setSalaryMin] = useState('');
+  const [salaryMax, setSalaryMax] = useState('');
+  const [departmentInput, setDepartmentInput] = useState('');
+  const [department, setDepartment] = useState('');
+  const [hireDateFrom, setHireDateFrom] = useState('');
+  const [hireDateTo, setHireDateTo] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -62,6 +68,15 @@ function Employees() {
 
     return () => clearTimeout(handle);
   }, [searchInput]);
+
+  useEffect(() => {
+    const handle = setTimeout(() => {
+      setDepartment(departmentInput.trim());
+      setPage(1);
+    }, 300);
+
+    return () => clearTimeout(handle);
+  }, [departmentInput]);
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
@@ -101,6 +116,21 @@ function Employees() {
       if (countryFilter !== 'all') {
         params.country = countryFilter;
       }
+      if (salaryMin !== '') {
+        params.salary_min = salaryMin;
+      }
+      if (salaryMax !== '') {
+        params.salary_max = salaryMax;
+      }
+      if (department) {
+        params.department = department;
+      }
+      if (hireDateFrom) {
+        params.hire_date_from = hireDateFrom;
+      }
+      if (hireDateTo) {
+        params.hire_date_to = hireDateTo;
+      }
       if (sortBy) {
         params.sort_by = sortBy;
         params.sort_order = sortOrder;
@@ -118,7 +148,7 @@ function Employees() {
 
   useEffect(() => {
     fetchEmployees(1);
-  }, [search, countryFilter, sortBy, sortOrder]);
+  }, [search, countryFilter, salaryMin, salaryMax, department, hireDateFrom, hireDateTo, sortBy, sortOrder]);
 
   useEffect(() => {
     if (page > totalPages) {
@@ -227,6 +257,28 @@ function Employees() {
     return sortOrder === 'asc' ? ' ↑' : ' ↓';
   };
 
+  const hasActiveFilters =
+    searchInput.trim().length > 0 ||
+    countryFilter !== 'all' ||
+    salaryMin !== '' ||
+    salaryMax !== '' ||
+    departmentInput.trim().length > 0 ||
+    hireDateFrom !== '' ||
+    hireDateTo !== '';
+
+  const clearFilters = () => {
+    setSearchInput('');
+    setSearch('');
+    setCountryFilter('all');
+    setSalaryMin('');
+    setSalaryMax('');
+    setDepartmentInput('');
+    setDepartment('');
+    setHireDateFrom('');
+    setHireDateTo('');
+    setPage(1);
+  };
+
   return (
     <section className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
@@ -269,6 +321,57 @@ function Employees() {
         {countriesError && (
           <span className="text-xs text-red-600">{countriesError}</span>
         )}
+        {hasActiveFilters && (
+          <button
+            type="button"
+            onClick={clearFilters}
+            className="rounded-xl border border-ink-200 px-3 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-ink-500 hover:border-ink-300 hover:text-ink-700"
+          >
+            Clear Filters
+          </button>
+        )}
+      </div>
+
+      <div className="flex flex-wrap items-center gap-4">
+        <div className="flex items-center gap-2">
+          <input
+            type="number"
+            min="0"
+            placeholder="Min Salary"
+            value={salaryMin}
+            onChange={(event) => setSalaryMin(event.target.value)}
+            className="w-36 rounded-xl border border-ink-200 bg-white px-3 py-2 text-sm text-ink-700 placeholder:text-ink-400 focus:border-brand-400 focus:outline-none"
+          />
+          <input
+            type="number"
+            min="0"
+            placeholder="Max Salary"
+            value={salaryMax}
+            onChange={(event) => setSalaryMax(event.target.value)}
+            className="w-36 rounded-xl border border-ink-200 bg-white px-3 py-2 text-sm text-ink-700 placeholder:text-ink-400 focus:border-brand-400 focus:outline-none"
+          />
+        </div>
+        <input
+          type="text"
+          placeholder="Department"
+          value={departmentInput}
+          onChange={(event) => setDepartmentInput(event.target.value)}
+          className="w-48 rounded-xl border border-ink-200 bg-white px-3 py-2 text-sm text-ink-700 placeholder:text-ink-400 focus:border-brand-400 focus:outline-none"
+        />
+        <div className="flex items-center gap-2">
+          <input
+            type="date"
+            value={hireDateFrom}
+            onChange={(event) => setHireDateFrom(event.target.value)}
+            className="rounded-xl border border-ink-200 bg-white px-3 py-2 text-sm text-ink-700 focus:border-brand-400 focus:outline-none"
+          />
+          <input
+            type="date"
+            value={hireDateTo}
+            onChange={(event) => setHireDateTo(event.target.value)}
+            className="rounded-xl border border-ink-200 bg-white px-3 py-2 text-sm text-ink-700 focus:border-brand-400 focus:outline-none"
+          />
+        </div>
       </div>
 
       <div className="rounded-2xl border border-ink-100 bg-white p-4">
