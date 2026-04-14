@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const EmployeeRepository = require('./src/repositories/EmployeeRepository');
 const EmployeeController = require('./src/controllers/EmployeeController');
 const { createEmployeeRouter } = require('./src/routes/employees');
@@ -12,6 +13,9 @@ const PORT = process.env.PORT || 4000;
 function createApp() {
   const app = express();
 
+  app.use(cors({
+    origin: process.env.FRONTEND_URL || '*'
+  }));
   app.use(express.json());
 
   app.get('/api/hello', (req, res) => {

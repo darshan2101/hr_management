@@ -6,7 +6,9 @@ let db = null;
 
 function getDb() {
   if (!db) {
-    const dbPath = process.env.NODE_ENV === 'test' ? ':memory:' : path.join(__dirname, '../../hr.db');
+    const dbPath = process.env.NODE_ENV === 'test'
+      ? ':memory:'
+      : path.join(process.env.DB_PATH || path.join(__dirname, '../..'), 'hr.db');
     db = new Database(dbPath);
     initializeSchema(db);
   }
