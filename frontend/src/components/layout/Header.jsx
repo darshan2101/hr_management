@@ -5,9 +5,6 @@ function Header({ title }) {
         <p className="text-xs uppercase tracking-[0.3em] text-ink-400">HR Management</p>
         <h2 className="text-2xl font-semibold text-ink-900">{title}</h2>
       </div>
-      <div className="rounded-full border border-ink-200 bg-ink-50 px-4 py-2 text-xs font-medium text-ink-600">
-        Internal Preview
-      </div>
     </header>
   );
 }
