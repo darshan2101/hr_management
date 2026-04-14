@@ -59,6 +59,7 @@ function Employees() {
   const [sortBy, setSortBy] = useState('');
   const [sortOrder, setSortOrder] = useState('asc');
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const [viewTarget, setViewTarget] = useState(null);
 
   useEffect(() => {
     const handle = setTimeout(() => {
@@ -189,6 +190,10 @@ function Employees() {
 
   const closeDeleteModal = () => {
     setDeleteTarget(null);
+  };
+
+  const closeViewModal = () => {
+    setViewTarget(null);
   };
 
   const handleChange = (event) => {
@@ -442,6 +447,14 @@ function Employees() {
                       <div className="flex justify-end gap-2">
                         <button
                           type="button"
+                          onClick={() => setViewTarget(employee)}
+                          className="rounded-lg border border-ink-200 px-2 py-1 text-xs text-ink-600 transition hover:border-ink-300 hover:text-ink-800"
+                          aria-label="View employee"
+                        >
+                          👁
+                        </button>
+                        <button
+                          type="button"
                           onClick={() => openEditModal(employee)}
                           className="rounded-lg border border-ink-200 px-2 py-1 text-xs text-ink-600 transition hover:border-brand-300 hover:text-brand-700"
                           aria-label="Edit employee"
@@ -635,6 +648,75 @@ function Employees() {
               >
                 Confirm
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {viewTarget && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-8"
+          onClick={closeViewModal}
+          role="presentation"
+        >
+          <div
+            className="w-full max-w-3xl rounded-2xl bg-white p-6 shadow-xl"
+            onClick={(event) => event.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Employee details"
+          >
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-ink-400">
+                  Employee Details
+                </p>
+                <h4 className="mt-1 text-lg font-semibold text-ink-900">{viewTarget.full_name}</h4>
+              </div>
+              <button
+                type="button"
+                onClick={closeViewModal}
+                className="rounded-full border border-ink-200 px-3 py-1 text-sm text-ink-600 hover:border-ink-300"
+                aria-label="Close"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="mt-6 grid gap-4 md:grid-cols-2">
+              <div>
+                <p className="text-xs uppercase tracking-[0.2em] text-ink-400">Full Name</p>
+                <p className="mt-2 text-sm text-ink-700">{viewTarget.full_name || '—'}</p>
+              </div>
+              <div>
+                <p className="text-xs uppercase tracking-[0.2em] text-ink-400">Job Title</p>
+                <p className="mt-2 text-sm text-ink-700">{viewTarget.job_title || '—'}</p>
+              </div>
+              <div>
+                <p className="text-xs uppercase tracking-[0.2em] text-ink-400">Department</p>
+                <p className="mt-2 text-sm text-ink-700">{viewTarget.department || '—'}</p>
+              </div>
+              <div>
+                <p className="text-xs uppercase tracking-[0.2em] text-ink-400">Country</p>
+                <p className="mt-2 text-sm text-ink-700">{viewTarget.country || '—'}</p>
+              </div>
+              <div>
+                <p className="text-xs uppercase tracking-[0.2em] text-ink-400">Salary</p>
+                <p className="mt-2 text-sm text-ink-700">
+                  {currencyFormatter.format(viewTarget.salary || 0)}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs uppercase tracking-[0.2em] text-ink-400">Hire Date</p>
+                <p className="mt-2 text-sm text-ink-700">{formatDate(viewTarget.hire_date)}</p>
+              </div>
+              <div>
+                <p className="text-xs uppercase tracking-[0.2em] text-ink-400">Email</p>
+                <p className="mt-2 text-sm text-ink-700">{viewTarget.email || '—'}</p>
+              </div>
+              <div>
+                <p className="text-xs uppercase tracking-[0.2em] text-ink-400">Phone</p>
+                <p className="mt-2 text-sm text-ink-700">{viewTarget.phone || '—'}</p>
+              </div>
             </div>
           </div>
         </div>
