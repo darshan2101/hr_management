@@ -48,10 +48,21 @@ class InsightsRepository {
       FROM employees
     `).get().count;
 
-    const avgSalary = this.db.prepare(`
-      SELECT AVG(salary) AS avg
+    const summaryRow = this.db.prepare(`
+      SELECT
+        AVG(salary) AS avg,
+        MAX(salary) AS max,
+        MIN(salary) AS min,
+        COUNT(DISTINCT country) AS totalCountries,
+        COUNT(DISTINCT job_title) AS totalJobTitles
       FROM employees
-    `).get().avg ?? 0;
+    `).get();
+
+    const avgSalary = summaryRow?.avg ?? 0;
+    const maxSalary = summaryRow?.max ?? 0;
+    const minSalary = summaryRow?.min ?? 0;
+    const totalCountries = summaryRow?.totalCountries ?? 0;
+    const totalJobTitles = summaryRow?.totalJobTitles ?? 0;
 
     const topCountries = this.db.prepare(`
       SELECT country, COUNT(*) AS count
@@ -101,6 +112,10 @@ class InsightsRepository {
     return {
       totalEmployees,
       avgSalary,
+      maxSalary,
+      minSalary,
+      totalCountries,
+      totalJobTitles,
       topCountries,
       salaryRanges
     };
