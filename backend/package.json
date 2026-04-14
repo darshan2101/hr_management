@@ -5,6 +5,7 @@
   "main": "server.js",
   "scripts": {
     "test": "npm run tests",
+    "build": "echo 'No build step required'",
     "tests": "mocha \"tests/**/*.test.js\"",
     "seed": "node scripts/seed.js",
     "start": "node server.js"
