@@ -5,6 +5,7 @@ function createEmployeeRouter(controller) {
   const router = express.Router();
 
   router.post('/', asyncHandler((req, res, next) => controller.create(req, res, next)));
+  router.get('/countries', asyncHandler((req, res, next) => controller.getCountries(req, res, next)));
   router.get('/', asyncHandler((req, res, next) => controller.findAll(req, res, next)));
   router.get('/:id', asyncHandler((req, res, next) => controller.findById(req, res, next)));
   router.patch('/:id', asyncHandler((req, res, next) => controller.update(req, res, next)));

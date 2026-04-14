@@ -109,6 +109,36 @@ describe('Employees API', () => {
     expect(searchedBody.data[0].job_title).to.equal('Engineer');
   });
 
+  it('GET /api/employees/countries returns sorted countries list', async () => {
+    await createEmployee({
+      full_name: 'Alice Johnson',
+      job_title: 'Engineer',
+      department: 'R&D',
+      country: 'USA',
+      salary: 120000
+    });
+    await createEmployee({
+      full_name: 'Carla Gomez',
+      job_title: 'Designer',
+      department: 'Design',
+      country: 'Spain',
+      salary: 90000
+    });
+    await createEmployee({
+      full_name: 'Brian Taylor',
+      job_title: 'Accountant',
+      department: 'Finance',
+      country: 'USA',
+      salary: 85000
+    });
+
+    const response = await fetch(`${baseUrl}/api/employees/countries`);
+
+    expect(response.status).to.equal(200);
+    const body = await response.json();
+    expect(body.countries).to.deep.equal(['Spain', 'USA']);
+  });
+
   it('GET /api/employees/:id returns employee or 404', async () => {
     const created = await (await createEmployee({
       full_name: 'Alice Johnson',

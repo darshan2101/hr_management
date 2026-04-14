@@ -29,6 +29,15 @@ class EmployeeController {
     }
   }
 
+  async getCountries(req, res, next) {
+    try {
+      const countries = this.employeeRepository.getDistinctCountries();
+      res.json({ countries });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async findById(req, res, next) {
     try {
       const employee = this.employeeRepository.findById(Number(req.params.id));

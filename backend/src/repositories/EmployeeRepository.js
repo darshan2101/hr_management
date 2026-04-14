@@ -81,6 +81,16 @@ class EmployeeRepository {
     return statement.get(id) || null;
   }
 
+  getDistinctCountries() {
+    const rows = this.db.prepare(`
+      SELECT DISTINCT country
+      FROM employees
+      ORDER BY country ASC
+    `).all();
+
+    return rows.map((row) => row.country);
+  }
+
   update(id, data) {
     const existing = this.findById(id);
     if (!existing) {

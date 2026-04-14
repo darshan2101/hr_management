@@ -142,6 +142,38 @@ describe('EmployeeRepository', () => {
     });
   });
 
+  describe('getDistinctCountries', () => {
+    it('returns sorted unique country list', () => {
+      seedEmployees([
+        {
+          full_name: 'Alice Johnson',
+          job_title: 'Engineer',
+          department: 'R&D',
+          country: 'USA',
+          salary: 120000
+        },
+        {
+          full_name: 'Carla Gomez',
+          job_title: 'Designer',
+          department: 'Design',
+          country: 'Spain',
+          salary: 90000
+        },
+        {
+          full_name: 'Brian Taylor',
+          job_title: 'Accountant',
+          department: 'Finance',
+          country: 'USA',
+          salary: 85000
+        }
+      ]);
+
+      const countries = repo.getDistinctCountries();
+
+      expect(countries).to.deep.equal(['Spain', 'USA']);
+    });
+  });
+
   describe('findById', () => {
     it('returns employee by id', () => {
       const created = repo.create({
